@@ -84,12 +84,12 @@ int main (int argc, char** argv)
     analyse(data, samples, output ? output : stdout, all);
 
     if (verbose) {
-        fprintf(stdout, "\n\nRawData\n");
+        fprintf(output ? output : stdout, "\n\nRawData\n");
         previousBit=0;
         for(i=0; i<samples; i++) {
            if ((previousBit == 0) && (data[i] == 1))
-               fprintf(stdout, "\n");
-           fprintf(stdout, "%c", data[i]+'0');
+               fprintf(output ? output : stdout, "\n");
+           fprintf(output ? output : stdout, "%c", data[i]+'0');
            previousBit = data[i];
        }
     }
