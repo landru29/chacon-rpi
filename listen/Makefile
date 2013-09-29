@@ -8,3 +8,6 @@ listen.o : listen.c
 
 listenlib.o : listenlib.c listenlib.h
 	gcc -c listenlib.c
+
+clean:
+	rm listen *.o

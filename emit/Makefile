@@ -8,3 +8,6 @@ emit.o : emit.c
 
 emitlib.o : emitlib.c emitlib.h
 	gcc -c emitlib.c
+
+clean:
+	rm -f emit *.o
