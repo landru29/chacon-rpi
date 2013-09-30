@@ -7,7 +7,7 @@ emit.o : emit.c
 	gcc -c emit.c
 
 emitlib.o : emitlib.c emitlib.h
-	gcc -c emitlib.c
+	gcc -c emitlib.c -o emitlib.o
 
 clean:
 	rm -f emit *.o

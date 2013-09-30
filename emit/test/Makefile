@@ -6,7 +6,7 @@ test : test.o emitlib.o
 test.o : test.c
 	gcc -c test.c -o test.o
 
-emitlib.o : emitlib.c emitlib.h
+emitlib.o : ../emitlib.c ../emitlib.h
 	gcc -c ../emitlib.c -o emitlib.o
 
 clean:
