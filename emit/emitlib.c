@@ -18,9 +18,9 @@ unsigned char numbering[4] = {0x05, 0x06, 0x09, 0x0A};
  *
  * @return the created buffer
  */
-BUFFER createBuffer()
+BIT_BUFFER createBitBuffer()
 {
-    BUFFER buffer;
+    BIT_BUFFER buffer;
     buffer.byteSize = 1;
     buffer.bitSize = 0;
     buffer.data = (char*) malloc(1);
@@ -33,7 +33,30 @@ BUFFER createBuffer()
  *
  * @param buffer the buffer to destroy
  */
-void destroyBuffer(BUFFER buffer)
+void destroyBitBuffer(BIT_BUFFER buffer)
+{
+    free(buffer.data);
+}
+
+/**
+ * Create a new byte buffer
+ *
+ * @return the created buffer
+ */
+BIT_BUFFER createByteBuffer()
+{
+    BYTE_BUFFER buffer;
+    buffer.size = 0;
+    buffer.data = (char*) malloc(1);
+    return buffer;
+}
+
+/**
+ * Release the memory
+ *
+ * @param buffer the buffer to destroy
+ */
+void destroyByteBuffer(BIT_BUFFER buffer)
 {
     free(buffer.data);
 }
@@ -43,7 +66,7 @@ void destroyBuffer(BUFFER buffer)
  *
  * @param buffer the buffer holding the data
  */
-void printfBinaryBuffer(BUFFER buffer)
+void printfBitBuffer(BIT_BUFFER buffer)
 {
     printf("bytes: %d\nbits: %d\n", buffer.byteSize, buffer.bitSize);
     unsigned char byte;
@@ -63,12 +86,25 @@ void printfBinaryBuffer(BUFFER buffer)
 }
 
 /**
+ * Print all the bytes from a buffer
+ *
+ * @param buffer the buffer holding the data
+ */
+void printfByteBuffer(BYTE_BUFFER buffer)
+{
+    unsigned int i;
+    for(i=0; i<buffer.size; i++) {
+        fprintf(stdout, "%02X ", buffer.data[i];
+    }
+}
+
+/**
  * Push a bit in a buffer
  *
  * @param buffer the buffer holding the data
  * @param bit the bit to push
  */
-void pushBit(BUFFER* buffer, unsigned char bit)
+void pushBit(BIT_BUFFER* buffer, unsigned char bit)
 {
     buffer->data[buffer->byteSize-1] |= bit << (7-buffer->bitSize);
     buffer->bitSize++;
@@ -81,6 +117,111 @@ void pushBit(BUFFER* buffer, unsigned char bit)
 }
 
 /**
+ * Push a byte in a buffer
+ *
+ * @param buffer the buffer holding the data
+ * @param byt the byte to push
+ */
+void pushByte(BYTE_BUFFER* buffer, unsigned char byte)
+{
+    buffer->size++
+    buffer->data = (char*)realloc(buffer->size);
+    buffer->data[buffer->size-1] = byte;
+}
+
+/**
+ * Push some bytes in a buffer
+ *
+ * @param buffer the buffer holding the data
+ * @param bytes the bytes to push
+ * @param len the number of bytes to push
+ */
+void pushBytes(BYTE_BUFFER* buffer, unsigned char *byte, unsigned int len)
+{
+    buffer->data = (char*)realloc(buffer->size+len);
+    memcpy(&buffer->data[buffer->size], byte, len);
+    buffer->size += len;
+}
+
+/**
+ * Encode bits with HomeEasy encoding (1 => 10, 0 => 01)
+ * 
+ * @param buffer the buffuer to encode
+ * 
+ * @return new buffer
+ * */
+BYTE_BUFFER homeEasyEncode(BYTE_BUFFER *buffer)
+{
+    BYTE_BUFFER result = createByteBuffer();
+    unsigned char byte;
+    unsigned char encodedByte;
+    unsigned int i;
+    for(i=0; i<buffer->size; i++) {
+        byte = buffer->data[i];
+        pushByte(buffer, encodeByte(byte & 0x0f);
+        pushByte(buffer, encodeByte((byte & 0xf0) >> 4);
+    }
+    return result;
+}
+
+/**
+ * Encode a byte according to HomeEasy
+ * 
+ * @param byte the byte to encode
+ * 
+ * @return the encoded byte
+ */
+unsigned char encodeByte(unsigned char byte)
+{
+    unsigned char encodedChar=0;
+    int j;
+    int shift = 6;
+    for(j=0x08;j>0; j>>=1) {
+      encodedChar |= (((byte & j) == j) ? 0x02 : 0x01) << shift;
+      shift -=2;
+    }
+    return encodedChar;
+}
+
+/**
+ * Decode bits with HomeEasy encoding (1 => 10, 0 => 01)
+ * 
+ * @param buffer the buffuer to decode
+ * 
+ * @return new buffer
+ * */
+BYTE_BUFFER homeEasyDecode(BYTE_BUFFER *buffer)
+{
+    BYTE_BUFFER result = createByteBuffer();
+    unsigned char byte;
+    unsigned int i;
+    /*for(i=0; i<buffer->size; i++) {
+        byte = buffer->data[i];
+        decodeByte(byte);
+    }*/
+    return result;
+}
+
+/**
+ * Decode a byte according to HomeEasy
+ * 
+ * @param byte the byte to decode
+ * 
+ * @return the decoded byte
+ */
+unsigned char decodeByte(unsigned char byte)
+{
+    unsigned char decodedChar=0;
+    int j;
+    int shift = 6;
+    for(j=0x80;j>0; j>>=2) {
+      decodedChar |= (((byte & j) == j) ? 0x01 : 0x00) << shift;
+      shift -=1;
+    }
+    return decodedChar;
+}
+
+/**
  * Append a bit that will be emitted for a specific time
  *
  * @param buffer the buffer holding the data
@@ -88,7 +229,7 @@ void pushBit(BUFFER* buffer, unsigned char bit)
  * @param usec time in µs
  * @param clock frequency
  */
-void appendBit(BUFFER* buffer, unsigned char bit, unsigned int usec, unsigned int freq)
+void appendBit(BIT_BUFFER* buffer, unsigned char bit, unsigned int usec, unsigned int freq)
 {
     unsigned int i;
     for(i=0; i<(usec * freq) / 1e6; i++) {
@@ -103,7 +244,7 @@ void appendBit(BUFFER* buffer, unsigned char bit, unsigned int usec, unsigned in
  * @param type data type (BIT0 | BIT1 | START_OF_FRAME | END_OF_DATA)
  * @param clock frequency
  */
-void appendData(BUFFER* buffer, unsigned int type, unsigned int freq)
+void appendData(BIT_BUFFER* buffer, unsigned int type, unsigned int freq)
 {
     appendBit(buffer, 1, timings[type][0], freq);
     appendBit(buffer, 0, timings[type][1], freq);
@@ -116,7 +257,7 @@ void appendData(BUFFER* buffer, unsigned int type, unsigned int freq)
  * @param byte the byte to append
  * @param clock frequency
  */
-void appendByte(BUFFER* buffer, unsigned char byte, unsigned int freq)
+void appendByte(BIT_BUFFER* buffer, unsigned char byte, unsigned int freq)
 {
     int i;
     for(i=0x80; i>0; i>>=1) {
@@ -137,7 +278,7 @@ void appendByte(BUFFER* buffer, unsigned char byte, unsigned int freq)
  * @param global if true G button is selected (nb will be ignore)
  * @param clock frequency
  */
-void pushCode(BUFFER* buffer, unsigned char* id, unsigned char section, unsigned char nb, unsigned char on, unsigned char global, unsigned int freq)
+void pushCode(BIT_BUFFER* buffer, unsigned char* id, unsigned char section, unsigned char nb, unsigned char on, unsigned char global, unsigned int freq)
 {
     unsigned char byte6 = (id[6] & 0xf0) + numbering[on + (global ? 2 : 0)];
     unsigned char byte7 = (numbering[section] << 4) + numbering[nb];

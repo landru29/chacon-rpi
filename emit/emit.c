@@ -1,5 +1,7 @@
 #include <stdio.h>
-#include <wiringPiSPI.h>
+#ifdef __arm__
+    #include <wiringPiSPI.h>
+#endif
 #include "emitlib.h"
 #include <malloc.h>
 #include <string.h>
@@ -37,7 +39,7 @@ void usage(char** argv)
  */
 int main(int argc, char** argv)
 {
-    BUFFER buffer;
+    BIT_BUFFER buffer;
     int i;
     char optstring[] = "xvb:d:f:r:";
     int option;
@@ -115,7 +117,7 @@ int main(int argc, char** argv)
     }
 
     // Preparing the buffer
-    buffer = createBuffer();
+    buffer = createBitBuffer();
 
     // Building the data
     for (i=0; i<repeat; i++) {
@@ -125,9 +127,10 @@ int main(int argc, char** argv)
 
     // Want to see the bits ?
     if (verbose) {
-        printfBinaryBuffer(buffer);
+        printfBitBuffer(buffer);
     }
 
+#ifdef __arm__
     // preparing the output
     if (wiringPiSPISetup(0, frequency) < 0) {
         printf("SPI Setup Failed: %s\n", strerror(errno));
@@ -135,8 +138,9 @@ int main(int argc, char** argv)
     }
     // Send data
     wiringPiSPIDataRW(0, (unsigned char*)buffer.data, buffer.byteSize);
+#endif
 
     // release memory
-    destroyBuffer(buffer);
+    destroyBitBuffer(buffer);
     return 0;
 }
