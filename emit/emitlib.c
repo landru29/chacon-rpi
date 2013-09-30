@@ -120,7 +120,7 @@ void pushBit(BIT_BUFFER* buffer, unsigned char bit)
  * Push a byte in a buffer
  *
  * @param buffer the buffer holding the data
- * @param byt the byte to push
+ * @param byte the byte to push
  */
 void pushByte(BYTE_BUFFER* buffer, unsigned char byte)
 {
@@ -129,6 +129,18 @@ void pushByte(BYTE_BUFFER* buffer, unsigned char byte)
     buffer->data[buffer->size-1] = byte;
 }
 
+/**
+ * Push a word in a buffer
+ *
+ * @param buffer the buffer holding the data
+ * @param word the word to push
+ */
+void pushWord(BYTE_BUFFER* buffer, unsigned short int word)
+{
+    unsigned char* data = &word;
+    pushByte(buffer, data[1]);
+    pushByte(buffer, data[0]);
+}
 /**
  * Push some bytes in a buffer
  *
@@ -158,29 +170,9 @@ BYTE_BUFFER homeEasyEncode(BYTE_BUFFER *buffer)
     unsigned int i;
     for(i=0; i<buffer->size; i++) {
         byte = buffer->data[i];
-        pushByte(buffer, encodeByte(byte & 0x0f);
-        pushByte(buffer, encodeByte((byte & 0xf0) >> 4);
+        pushWord(buffer, encodeByte(byte);
     }
     return result;
-}
-
-/**
- * Encode a byte according to HomeEasy
- * 
- * @param byte the byte to encode
- * 
- * @return the encoded byte
- */
-unsigned char encodeByte(unsigned char byte)
-{
-    unsigned char encodedChar=0;
-    int j;
-    int shift = 6;
-    for(j=0x08;j>0; j>>=1) {
-      encodedChar |= (((byte & j) == j) ? 0x02 : 0x01) << shift;
-      shift -=2;
-    }
-    return encodedChar;
 }
 
 /**
@@ -193,12 +185,14 @@ unsigned char encodeByte(unsigned char byte)
 BYTE_BUFFER homeEasyDecode(BYTE_BUFFER *buffer)
 {
     BYTE_BUFFER result = createByteBuffer();
-    unsigned char byte;
+    unsigned short int word;
+    unsigned char *byte = &word;
     unsigned int i;
-    /*for(i=0; i<buffer->size; i++) {
-        byte = buffer->data[i];
-        decodeByte(byte);
-    }*/
+    for(i=0; i<(buffer->size+1)/2; i++) {
+        byte[1] = buffer->data[2*i];
+        byte[0] = (2*i+1 < buffer->size ? buffer->data[2*i+1]:0);
+        pushByte(buffer, decodeByte(word));
+    }
     return result;
 }
 
@@ -209,16 +203,35 @@ BYTE_BUFFER homeEasyDecode(BYTE_BUFFER *buffer)
  * 
  * @return the decoded byte
  */
-unsigned char decodeByte(unsigned char byte)
+unsigned char decodeByte(unsigned short int byte)
 {
     unsigned char decodedChar=0;
     int j;
     int shift = 6;
-    for(j=0x80;j>0; j>>=2) {
+    for(j=0x8000;j>0; j>>=2) {
       decodedChar |= (((byte & j) == j) ? 0x01 : 0x00) << shift;
       shift -=1;
     }
     return decodedChar;
+}
+
+/**
+ * Encode a byte according to HomeEasy
+ * 
+ * @param byte the byte to encode
+ * 
+ * @return the encoded byte
+ */
+unsigned short int encodeByte(unsigned char byte)
+{
+    unsigned short int encodedChar=0;
+    int j;
+    int shift = 6;
+    for(j=0x80;j>0; j>>=1) {
+      encodedChar |= (((byte & j) == j) ? 0x02 : 0x01) << shift;
+      shift -=2;
+    }
+    return encodedChar;
 }
 
 /**

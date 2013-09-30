@@ -92,6 +92,14 @@ void pushBit(BIT_BUFFER* buffer, unsigned char bit);
 void pushByte(BYTE_BUFFER* buffer, unsigned char byte);
 
 /**
+ * Push a word in a buffer
+ *
+ * @param buffer the buffer holding the data
+ * @param word the word to push
+ */
+void pushWord(BYTE_BUFFER* buffer, unsigned short int word)
+
+/**
  * Push some bytes in a buffer
  *
  * @param buffer the buffer holding the data
