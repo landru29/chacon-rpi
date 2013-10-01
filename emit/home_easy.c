@@ -211,9 +211,9 @@ int initIO()
  */
 void sendHomeEasyBit(unsigned char bit)
 {
-    digitalWrite(homeEasyPinOut, 1);
+    digitalWrite(homeEasyPinOut, HIGH_RF);
     delayMicroseconds(timings[bit][0]);
-    digitalWrite(homeEasyPinOut, 0);
+    digitalWrite(homeEasyPinOut, LOW_RF);
     delayMicroseconds(timings[bit][1]);
 }
 

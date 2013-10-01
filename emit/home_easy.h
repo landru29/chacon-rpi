@@ -13,6 +13,9 @@
 #define ON 1
 #define OFF 0
 
+#define HIGH_RF 1
+#define LOW_RF 0
+
 /**
  * Encode bits with HomeEasy encoding (1 => 10, 0 => 01)
  * 
