@@ -10,7 +10,7 @@ typedef struct {
 #define BIT0 0
 #define BIT1 1
 #define START_OF_FRAME  2
-#define END_OF_DATA 3
+#define START_OF_DATA 3
 
 #define ON 1
 #define OFF 0

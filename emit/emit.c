@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     unsigned long int frequency = DEFAULT_FREQ;
     unsigned char onOff = ON;
     unsigned int verbose = 0;
-    unsigned repeat = 1;
+    unsigned repeat = 5;
 
 
     /* reading options */

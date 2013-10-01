@@ -4,12 +4,20 @@
 #include "emitlib.h"
 
 
-unsigned int timings[4][2] = {
+/*unsigned int timings[4][2] = {
     {250, 250},  //  bit 0
     {250, 1200}, //  bit 1
     {250, 2600}, //  start of frame
     {250, 9900}  //  end of data
+};*/
+
+unsigned int timings[4][2] = {
+    {310, 310},  //  bit 0
+    {310, 1340}, //  bit 1
+    {275, 2675}, //  start of frame
+    {275, 9900}  //  end of data
 };
+
 
 unsigned char numbering[4] = {0x05, 0x06, 0x09, 0x0A};
 
@@ -145,6 +153,7 @@ void pushCode(BUFFER* buffer, unsigned char* id, unsigned char section, unsigned
     if (global) {
         byte7 = 0x55;
     }
+    appendData(buffer, START_OF_DATA, freq);
     appendData(buffer, START_OF_FRAME, freq);
     printf("SOF ");
     for(i=0; i<6; i++) {
@@ -152,6 +161,6 @@ void pushCode(BUFFER* buffer, unsigned char* id, unsigned char section, unsigned
     }
     appendByte(buffer, byte6, freq);
     appendByte(buffer, byte7, freq);
-    appendData(buffer, END_OF_DATA, freq);
+    appendData(buffer, START_OF_FRAME, freq);
     printf("EOD ");
 }
