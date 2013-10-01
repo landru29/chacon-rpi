@@ -1,6 +1,9 @@
 #include <stdio.h>
-#include <wiringPiSPI.h>
-#include "emitlib.h"
+#ifdef __arm__
+    #include <wiringPiSPI.h>
+#endif
+#include "home_easy.h"
+#include "buffer.h"
 #include <malloc.h>
 #include <string.h>
 #include <unistd.h>
@@ -37,13 +40,14 @@ void usage(char** argv)
  */
 int main(int argc, char** argv)
 {
-    BUFFER buffer;
+    //BIT_BUFFER buffer;
+    BYTE_BUFFER command;
+    BYTE_BUFFER encoded;
     int i;
     char optstring[] = "xvb:d:f:r:";
     int option;
-    unsigned char global=NO_GLOBAL;
-    unsigned char number = NUMBER1;
-    unsigned char section = SECTION_A;
+    unsigned char number = 1;
+    unsigned char section = 'A';
     char *idString=0;
     unsigned long int frequency = DEFAULT_FREQ;
     unsigned char onOff = ON;
@@ -57,13 +61,9 @@ int main(int argc, char** argv)
         switch (option) {
             case 'b':
                 // Decode the button ie : A3
-                section = optarg[0] - (optarg[0]<'Z' ? 'A' : 'a');
+                section = optarg[0] - (optarg[0]<'Z' ? 0 : 'a' - 'A');
                 if (strlen(optarg)>1) {
                     number =  optarg[1] - '0';
-                }
-                if (section== 6) {
-                    // G was requested
-                    global = GLOBAL;
                 }
                 break;
             case 'r':
@@ -106,16 +106,26 @@ int main(int argc, char** argv)
     }
 
     // Show informations
-    printf("Frequency config on SPI: %dHz\n", frequency);
+    printf("Frequency config on SPI: %luHz\n", frequency);
 
-    if (global) {
+    if (section == 'G') {
         printf("Sending command G: %s\n", (onOff == OFF) ? "OFF" : "ON");
     } else {
-        printf("Sending command %c%d: %s\n", section+'A', number, (onOff == OFF) ? "OFF" : "ON");
+        printf("Sending command %c%d: %s\n", section, number, (onOff == OFF) ? "OFF" : "ON");
     }
+    
+    command = createHomeEasyCommand(idString, section, number, onOff);
+    printfByteBuffer(command);
+    
+    printf("Code to emit:\n");
+    encoded = homeEasyEncode(&command);
+    printfByteBuffer(encoded);
+    
+    destroyByteBuffer(command);
+    destroyByteBuffer(encoded);
 
     // Preparing the buffer
-    buffer = createBuffer();
+    /*buffer = createBitBuffer();
 
     // Building the data
     for (i=0; i<repeat; i++) {
@@ -125,9 +135,10 @@ int main(int argc, char** argv)
 
     // Want to see the bits ?
     if (verbose) {
-        printfBinaryBuffer(buffer);
+        printfBitBuffer(buffer);
     }
 
+#ifdef __arm__
     // preparing the output
     if (wiringPiSPISetup(0, frequency) < 0) {
         printf("SPI Setup Failed: %s\n", strerror(errno));
@@ -135,8 +146,10 @@ int main(int argc, char** argv)
     }
     // Send data
     wiringPiSPIDataRW(0, (unsigned char*)buffer.data, buffer.byteSize);
+#endif
 
     // release memory
-    destroyBuffer(buffer);
+    destroyBitBuffer(buffer);*/
+    
     return 0;
 }
