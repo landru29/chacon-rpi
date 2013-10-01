@@ -2,7 +2,8 @@
 #ifdef __arm__
     #include <wiringPiSPI.h>
 #endif
-#include "emitlib.h"
+#include "home_easy.h"
+#include "buffer.h"
 #include <malloc.h>
 #include <string.h>
 #include <unistd.h>

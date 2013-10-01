@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "../emitlib.h"
+#include "../home_easy.h"
+#include "../buffer.h"
 
 #define TEST_START printf("\n=== %s ===\n", __FUNCTION__)
 
@@ -35,28 +36,6 @@ void testPrintBits()
     
     destroyByteBuffer(buffer);
 }
-
-/*void testBitBuffer()
-{
-    BIT_BUFFER buffer;
-    TEST_START;
-    buffer = createBitBuffer();
-    
-    bitPushBit(&buffer, 1);
-    bitPushBit(&buffer, 1);
-    bitPushBit(&buffer, 1);
-    bitPushBit(&buffer, 1);
-    bitPushBit(&buffer, 0);
-    bitPushBit(&buffer, 0);
-    bitPushBit(&buffer, 0);
-    bitPushBit(&buffer, 0);
-    
-    printf("Should: 11110000\nGet: ");
-    printfBitBuffer(buffer);
-    printf("\n");
-    
-    destroyBitBuffer(buffer);
-}*/
 
 void testEncode()
 {

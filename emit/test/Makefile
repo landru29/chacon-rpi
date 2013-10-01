@@ -1,13 +1,13 @@
 all : test
 
-test : test.o emitlib.o
-	gcc -o test test.o emitlib.o
+test : test.o buffer.o home_easy.o utils.o
+	gcc -o $@ $^
 
 test.o : test.c
-	gcc -c test.c -o test.o
+	gcc -c $< -o $@
 
-emitlib.o : ../emitlib.c ../emitlib.h
-	gcc -c ../emitlib.c -o emitlib.o
+%.o : ../%.c ../%.h
+	gcc -c $< -o $@
 
 clean:
 	rm -f test *.o

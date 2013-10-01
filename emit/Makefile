@@ -1,13 +1,13 @@
 all : emit
 
-emit : emit.o emitlib.o
-	gcc -o emit emit.o emitlib.o -lwiringPi
+emit : emit.o buffer.o home_easy.o utils.o
+	gcc -o $@ $^ -lwiringPi
 
 emit.o : emit.c
-	gcc -c emit.c
+	gcc -c $< -o $@
 
-emitlib.o : emitlib.c emitlib.h
-	gcc -c emitlib.c -o emitlib.o
+%.o : %.c %.h
+	gcc -c $< -o $@
 
 clean:
 	rm -f emit *.o
