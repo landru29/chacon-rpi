@@ -68,7 +68,7 @@ BYTE_BUFFER createHomeEasyCommand(unsigned char* id, char section, unsigned char
  * @param on boolean for on/off
  * @param repeat number of repeatition
  */
-void SendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on, unsigned char repeat);
+void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on, unsigned char repeat);
 
 /**
  * Configure the GPIO output pin
@@ -76,6 +76,13 @@ void SendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsi
  * @param pinNumber wiringPi pin number
  */
 void setHomeEasyTransmittorPin(unsigned char pinNumber);
+
+/**
+ * Init input/output
+ *
+ * @return status
+ */
+int initIO();
 
 /**
  * read the GPIO output pin

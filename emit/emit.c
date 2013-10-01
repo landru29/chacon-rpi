@@ -113,14 +113,18 @@ int main(int argc, char** argv)
     } else {
         printf("Sending command %c%d: %s\n", section, number, (onOff == OFF) ? "OFF" : "ON");
     }
-    
+
     command = createHomeEasyCommand(idString, section, number, onOff);
     printfByteBuffer(command);
-    
+
     printf("Code to emit:\n");
     encoded = homeEasyEncode(&command);
     printfByteBuffer(encoded);
-    
+
+    initIO();
+    sendHomeEasyCommand(idString, section, number, onOff, repeat);
+
+
     destroyByteBuffer(command);
     destroyByteBuffer(encoded);
 

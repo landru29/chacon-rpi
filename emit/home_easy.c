@@ -16,14 +16,14 @@ unsigned int timings[5][2] = {
 };
 
 unsigned char homeEasyPinOut = 0;
-unsigned char homeEasyPinIn = 1;
+unsigned char homeEasyPinIn = 2;
 
 
 /**
  * Encode bits with HomeEasy encoding (1 => 10, 0 => 01)
- * 
+ *
  * @param buffer the buffuer to encode
- * 
+ *
  * @return new buffer
  * */
 BYTE_BUFFER homeEasyEncode(BYTE_BUFFER *buffer)
@@ -38,9 +38,9 @@ BYTE_BUFFER homeEasyEncode(BYTE_BUFFER *buffer)
 
 /**
  * Decode bits with HomeEasy encoding (1 => 10, 0 => 01)
- * 
+ *
  * @param buffer the buffuer to decode
- * 
+ *
  * @return new buffer
  * */
 BYTE_BUFFER homeEasyDecode(BYTE_BUFFER *buffer)
@@ -59,9 +59,9 @@ BYTE_BUFFER homeEasyDecode(BYTE_BUFFER *buffer)
 
 /**
  * Decode a byte according to HomeEasy
- * 
+ *
  * @param byte the byte to decode
- * 
+ *
  * @return the decoded byte
  */
 unsigned char decodeByte(unsigned short int word)
@@ -132,7 +132,7 @@ BYTE_BUFFER createHomeEasyCommand(unsigned char* id, char section, unsigned char
  * @param on boolean for on/off
  * @param repeat number of repeatition
  */
-void SendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on, unsigned char repeat)
+void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on, unsigned char repeat)
 {
 	BYTE_BUFFER command;
 	unsigned int i;
@@ -186,15 +186,34 @@ unsigned char getHomeEasyReceptorPin()
 }
 
 /**
+ * Init input/output
+ *
+ * @return status
+ */
+int initIO()
+{
+    int status;
+    status = wiringPiSetup();
+    if (status != -1) {
+        printf("Setting up GPIO\n");
+        pinMode(homeEasyPinIn, INPUT);
+        pinMode(homeEasyPinOut, OUTPUT);
+    } else {
+        printf("GPIO setup failed %d\n", status);
+    }
+    return status;
+}
+
+/**
  * Send a bit to the RF transmitter
  * 
  * @param bit the bit to transmit (0 | 1 | TRIGGER0 | TRIGGER1 | END_OF_FRAME)
  */
 void sendHomeEasyBit(unsigned char bit)
 {
-	digitalWrite(homeEasyPinOut, 1);
+    digitalWrite(homeEasyPinOut, 1);
     delayMicroseconds(timings[bit][0]);
-   	digitalWrite(homeEasyPinOut, 0);
+    digitalWrite(homeEasyPinOut, 0);
     delayMicroseconds(timings[bit][1]);
 }
 
@@ -213,15 +232,15 @@ void sendHomeEasyByte(unsigned char byte)
 
 /**
  * Send the content of a buffer to the RF transmitter
- * 
+ *
  * @param buffer the buffer to transmit
  */
 void sendHomeEasyBytes(BYTE_BUFFER buffer)
 {
-	unsigned int i;
-	for(i=0; i<buffer.size; i++) {
-		sendHomeEasyByte(buffer.data[i]);
-	}
+    unsigned int i;
+    for(i=0; i<buffer.size; i++) {
+        sendHomeEasyByte(buffer.data[i]);
+    }
 }
 
 /**
