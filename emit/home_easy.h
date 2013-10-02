@@ -6,15 +6,12 @@
 
 #define BIT0 0
 #define BIT1 1
-#define TRIGGER0 2
-#define TRIGGER1 3
-#define END_OF_FRAME 3
+#define START_OF_DATA 2
+#define START_OF_FRAME 3
+#define END_OF_FRAME 4
 
 #define ON 1
 #define OFF 0
-
-#define HIGH_RF 1
-#define LOW_RF 0
 
 /**
  * Encode bits with HomeEasy encoding (1 => 10, 0 => 01)
@@ -86,6 +83,11 @@ void setHomeEasyTransmittorPin(unsigned char pinNumber);
  * @return status
  */
 int initIO();
+
+/**
+ * Return to normal mode
+ */
+void closeIO();
 
 /**
  * read the GPIO output pin

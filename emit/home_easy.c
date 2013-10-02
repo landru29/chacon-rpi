@@ -8,9 +8,11 @@
 #include "utils.h"
 
 unsigned int timings[5][2] = {
-    {275, 275},  //  bit 0
-    {275, 1300}, //  bit 1
-    {275, 9900},  //  end of data
+    {310, 310},  // bit 0
+    {310, 1340}, // bit 1
+    //{275, 275},  //  bit 0
+    //{275, 1300}, //  bit 1
+    {275, 9900},  //  start of data
     {275, 2675}, //  start of frame
     {275, 2675},  //  end of data
 };
@@ -198,10 +200,19 @@ int initIO()
         printf("Setting up GPIO\n");
         pinMode(homeEasyPinIn, INPUT);
         pinMode(homeEasyPinOut, OUTPUT);
+        scheduler_realtime();
     } else {
         printf("GPIO setup failed %d\n", status);
     }
     return status;
+}
+
+/**
+ * Return to normal mode
+ */
+void closeIO()
+{
+    scheduler_standard();
 }
 
 /**
@@ -211,10 +222,11 @@ int initIO()
  */
 void sendHomeEasyBit(unsigned char bit)
 {
-    digitalWrite(homeEasyPinOut, HIGH_RF);
+    digitalWrite(homeEasyPinOut, HIGH);
     delayMicroseconds(timings[bit][0]);
-    digitalWrite(homeEasyPinOut, LOW_RF);
+    digitalWrite(homeEasyPinOut, LOW);
     delayMicroseconds(timings[bit][1]);
+    digitalWrite(homeEasyPinOut, HIGH);
 }
 
 /**
