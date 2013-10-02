@@ -85,11 +85,6 @@ void setHomeEasyTransmittorPin(unsigned char pinNumber);
 int initIO();
 
 /**
- * Return to normal mode
- */
-void closeIO();
-
-/**
  * read the GPIO output pin
  *
  * @return wiringPi pin number

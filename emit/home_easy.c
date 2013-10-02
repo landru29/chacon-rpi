@@ -138,13 +138,20 @@ void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsi
 {
 	BYTE_BUFFER command;
 	unsigned int i;
+    // build the command
 	command = createHomeEasyCommand(id, section, nb, on);
+    // switch to real time
+    scheduler_realtime();
+    // send header
 	sendHomeEasyBit(START_OF_DATA);
 	sendHomeEasyBit(START_OF_FRAME);
+    // repeat the command
 	for(i=0; i<repeat; i++) {
 		sendHomeEasyBytes(command);
 		sendHomeEasyBit(END_OF_FRAME);
 	}
+    // Exit real time mode
+    scheduler_standard();
 }
 
 /**
@@ -200,19 +207,10 @@ int initIO()
         printf("Setting up GPIO\n");
         pinMode(homeEasyPinIn, INPUT);
         pinMode(homeEasyPinOut, OUTPUT);
-        scheduler_realtime();
     } else {
         printf("GPIO setup failed %d\n", status);
     }
     return status;
-}
-
-/**
- * Return to normal mode
- */
-void closeIO()
-{
-    scheduler_standard();
 }
 
 /**

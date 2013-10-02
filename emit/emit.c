@@ -123,7 +123,6 @@ int main(int argc, char** argv)
 
     initIO();
     sendHomeEasyCommand(idString, section, number, onOff, repeat);
-    closeIO();
 
     destroyByteBuffer(command);
     destroyByteBuffer(encoded);
