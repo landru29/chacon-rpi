@@ -15,36 +15,36 @@
 
 /**
  * Encode bits with HomeEasy encoding (1 => 10, 0 => 01)
- * 
+ *
  * @param buffer the buffuer to encode
- * 
+ *
  * @return new buffer
  * */
 BYTE_BUFFER homeEasyEncode(BYTE_BUFFER *buffer);
 
 /**
  * Decode bits with HomeEasy encoding (1 => 10, 0 => 01)
- * 
+ *
  * @param buffer the buffuer to decode
- * 
+ *
  * @return new buffer
  * */
 BYTE_BUFFER homeEasyDecode(BYTE_BUFFER *buffer);
 
 /**
  * Encode a byte according to HomeEasy
- * 
+ *
  * @param byte the byte to encode
- * 
+ *
  * @return the encoded byte
  */
 unsigned short int encodeByte(unsigned char byte);
 
 /**
  * Decode a byte according to HomeEasy
- * 
+ *
  * @param byte the byte to decode
- * 
+ *
  * @return the decoded byte
  */
 unsigned char decodeByte(unsigned short int word);
@@ -69,6 +69,14 @@ BYTE_BUFFER createHomeEasyCommand(unsigned char* id, char section, unsigned char
  * @param repeat number of repeatition
  */
 void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on, unsigned char repeat);
+
+/**
+ * Send n times a data frame
+ *
+ * @param frame the data to send
+ * @param repeat number of repeatition
+ */
+void sendFrame(BYTE_BUFFER frame, unsigned int repeat);
 
 /**
  * Configure the GPIO output pin

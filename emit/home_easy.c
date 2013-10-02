@@ -8,13 +8,13 @@
 #include "utils.h"
 
 unsigned int timings[5][2] = {
-    {310, 310},  // bit 0
-    {310, 1340}, // bit 1
-    //{275, 275},  //  bit 0
-    //{275, 1300}, //  bit 1
+    //{310, 310},  // bit 0
+    //{310, 1340}, // bit 1
+    {275, 275},  //  bit 0
+    {275, 1300}, //  bit 1
     {275, 9900},  //  start of data
     {275, 2675}, //  start of frame
-    {275, 2675},  //  end of data
+    {275, 10000},  //  end of data
 };
 
 unsigned char homeEasyPinOut = 0;
@@ -80,9 +80,9 @@ unsigned char decodeByte(unsigned short int word)
 
 /**
  * Encode a byte according to HomeEasy
- * 
+ *
  * @param byte the byte to encode
- * 
+ *
  * @return the encoded byte
  */
 unsigned short int encodeByte(unsigned char byte)
@@ -126,6 +126,29 @@ BYTE_BUFFER createHomeEasyCommand(unsigned char* id, char section, unsigned char
 }
 
 /**
+ * Send n times a data frame
+ *
+ * @param frame the data to send
+ * @param repeat number of repeatition
+ */
+void sendFrame(BYTE_BUFFER frame, unsigned int repeat)
+{
+    unsigned int i;
+    // switch to real time
+    scheduler_realtime();
+    // send header
+    sendHomeEasyBit(START_OF_DATA);
+    sendHomeEasyBit(START_OF_FRAME);
+    // repeat the command
+    for(i=0; i<repeat; i++) {
+        sendHomeEasyBytes(frame);
+        sendHomeEasyBit(END_OF_FRAME);
+    }
+    // Exit real time mode
+    scheduler_standard();
+}
+
+/**
  * Send a complete command according to Chacon protocole
  *
  * @param id command id (refer to your remote)
@@ -136,22 +159,17 @@ BYTE_BUFFER createHomeEasyCommand(unsigned char* id, char section, unsigned char
  */
 void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on, unsigned char repeat)
 {
-	BYTE_BUFFER command;
-	unsigned int i;
+    BYTE_BUFFER command;
+    BYTE_BUFFER encoded;
     // build the command
-	command = createHomeEasyCommand(id, section, nb, on);
-    // switch to real time
-    scheduler_realtime();
-    // send header
-	sendHomeEasyBit(START_OF_DATA);
-	sendHomeEasyBit(START_OF_FRAME);
-    // repeat the command
-	for(i=0; i<repeat; i++) {
-		sendHomeEasyBytes(command);
-		sendHomeEasyBit(END_OF_FRAME);
-	}
-    // Exit real time mode
-    scheduler_standard();
+    command = createHomeEasyCommand(id, section, nb, on);
+    // encode the command
+    encoded = homeEasyEncode(&command);
+    // send data
+    sendFrame(encoded, repeat);
+    // release the memory
+    destroyByteBuffer(command);
+    destroyByteBuffer(encoded);
 }
 
 /**
@@ -161,7 +179,7 @@ void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsi
  */
 void setHomeEasyTransmittorPin(unsigned char pinNumber)
 {
-	homeEasyPinOut = pinNumber;
+    homeEasyPinOut = pinNumber;
 }
 
 /**
@@ -171,7 +189,7 @@ void setHomeEasyTransmittorPin(unsigned char pinNumber)
  */
 unsigned char getHomeEasyTransmittorPin()
 {
-	return homeEasyPinOut;
+    return homeEasyPinOut;
 }
 
 /**
@@ -181,7 +199,7 @@ unsigned char getHomeEasyTransmittorPin()
  */
 void setHomeEasyReceptorPin(unsigned char pinNumber)
 {
-	homeEasyPinIn = pinNumber;
+    homeEasyPinIn = pinNumber;
 }
 
 /**
@@ -191,7 +209,7 @@ void setHomeEasyReceptorPin(unsigned char pinNumber)
  */
 unsigned char getHomeEasyReceptorPin()
 {
-	return homeEasyPinIn;
+    return homeEasyPinIn;
 }
 
 /**
@@ -204,7 +222,6 @@ int initIO()
     int status;
     status = wiringPiSetup();
     if (status != -1) {
-        printf("Setting up GPIO\n");
         pinMode(homeEasyPinIn, INPUT);
         pinMode(homeEasyPinOut, OUTPUT);
     } else {
@@ -215,7 +232,7 @@ int initIO()
 
 /**
  * Send a bit to the RF transmitter
- * 
+ *
  * @param bit the bit to transmit (0 | 1 | TRIGGER0 | TRIGGER1 | END_OF_FRAME)
  */
 void sendHomeEasyBit(unsigned char bit)
@@ -229,7 +246,7 @@ void sendHomeEasyBit(unsigned char bit)
 
 /**
  * Send a byte to the RF transmitter
- * 
+ *
  * @param byte the byte to transmit
  */
 void sendHomeEasyByte(unsigned char byte)
@@ -288,7 +305,7 @@ BYTE_BUFFER readData(unsigned long int samples, unsigned int duration)
     struct timeval* start;
     BYTE_BUFFER result;
     unsigned long int i;
-    
+
     result = createByteBuffer();
     result.size = samples;
     result.data = (char*) realloc(result.data, samples);

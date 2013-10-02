@@ -11,3 +11,6 @@ emit.o : emit.c
 
 clean:
 	rm -f emit *.o
+
+install: emit
+	cp -f emit /usr/local/bin/.
