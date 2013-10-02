@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <malloc.h>
+#include <sched.h>
 #include "utils.h"
 
 
@@ -26,4 +27,28 @@ struct timeval* showTime(struct timeval* start)
     tv_usec = (start->tv_usec > stop->tv_usec) ? 1000000 + stop->tv_usec - start->tv_usec : stop->tv_usec - start->tv_usec;
     fprintf(stderr, "%lus %lums %luµs\n", tv_sec, tv_usec/1000, tv_sec % 1000);
     return stop;
+}
+
+/**
+ * Switch to real-time mode
+ */
+void scheduler_realtime()
+{
+    struct sched_param p;
+    p.__sched_priority = sched_get_priority_max(SCHED_RR);
+    if( sched_setscheduler( 0, SCHED_RR, &p ) == -1 ) {
+        perror("Failed to switch to realtime scheduler.");
+    }
+}
+
+/**
+ * Exit from real-time mode
+ */
+void scheduler_standard()
+{
+    struct sched_param p;
+    p.__sched_priority = 0;
+    if( sched_setscheduler( 0, SCHED_OTHER, &p ) == -1 ) {
+        perror("Failed to switch to normal scheduler.");
+    }
 }

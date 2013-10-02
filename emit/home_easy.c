@@ -139,8 +139,8 @@ void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsi
 	BYTE_BUFFER command;
 	unsigned int i;
 	command = createHomeEasyCommand(id, section, nb, on);
-	sendHomeEasyBit(TRIGGER0);
-	sendHomeEasyBit(TRIGGER1);
+	sendHomeEasyBit(START_OF_DATA);
+	sendHomeEasyBit(START_OF_FRAME);
 	for(i=0; i<repeat; i++) {
 		sendHomeEasyBytes(command);
 		sendHomeEasyBit(END_OF_FRAME);

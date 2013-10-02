@@ -15,4 +15,15 @@
  */
 struct timeval* showTime(struct timeval* start);
 
+/**
+ * Switch to real-time mode
+ */
+void scheduler_realtime();
+
+/**
+ * Exit from real-time mode
+ */
+void scheduler_standard();
+
+
 #endif
