@@ -144,6 +144,7 @@ void sendFrame(BYTE_BUFFER frame, unsigned int repeat)
         sendHomeEasyBytes(frame);
         sendHomeEasyBit(END_OF_FRAME);
     }
+    digitalWrite(homeEasyPinOut, LOW);
     // Exit real time mode
     scheduler_standard();
 }
