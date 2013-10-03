@@ -45,6 +45,7 @@ int main(int argc, char** argv)
     unsigned char number = 1;
     unsigned char section = 'A';
     char *idString=0;
+    unsigned long int id=0;
     unsigned char onOff = ON;
     unsigned int verbose = 0;
     unsigned repeat = 5;
@@ -67,13 +68,7 @@ int main(int argc, char** argv)
                 break;
             case 'd':
                 // command id
-                idString = (char*)malloc(1+strlen(optarg)/2);
-                for(i=0; i<strlen(optarg)/2 + strlen(optarg) % 2; i++) {
-                    idString[i] = (optarg[i*2] - (optarg[i*2]<='9' ? '0' : (optarg[i*2]<='Z' ? 'A' : 'a')-10)) << 4;
-                    if (optarg[1+i*2]) {
-                        idString[i] += optarg[1+i*2] - (optarg[1+i*2]<='9' ? '0' : (optarg[1+i*2]<='Z' ? 'A' : 'a')-10);
-                    }
-                }
+                sscanf(optarg, "%08X", &id);
                 break;
             case 'x':
                 // OFF ?
@@ -90,13 +85,8 @@ int main(int argc, char** argv)
         }
     }
 
-    // No ID specified, it will be "00 00 00 00 00 00 0"
-    if (!idString) {
-        idString = (char*)malloc(7);
-        memset(idString, 0, 7);
-    }
-
     // Show informations
+    printf("device id: %08X\n", id);
     if (section == 'G') {
         printf("Sending command G: %s\n", (onOff == OFF) ? "OFF" : "ON");
     } else {
@@ -105,8 +95,8 @@ int main(int argc, char** argv)
 
     // Display mor information
     if (verbose) {
-        command = createHomeEasyCommand(idString, section, number, onOff);
-        printfByteBuffer(command);
+        command = createHomeEasyCommand(id, section, number, onOff);
+        printf("Frame to send: %08X\n", command);
 
         printf("Code to emit:\n");
         encoded = homeEasyEncode(&command);
@@ -115,7 +105,7 @@ int main(int argc, char** argv)
 
     // Send the data
     initIO();
-    sendHomeEasyCommand(idString, section, number, onOff, repeat);
+    sendHomeEasyCommand(id, section, number, onOff, repeat);
 
     // release the memory
     destroyByteBuffer(command);

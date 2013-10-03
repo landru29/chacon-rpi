@@ -40,14 +40,10 @@ void testPrintBits()
 void testGetId()
 {
     unsigned long int id;
-    BYTE_BUFFER buffer;
-    char bytes[] = {0x28, 0x29, 0x01, 0x9a};
+    unsigned long int frame = 0x2829019a;
     TEST_START;
 
-    buffer = createByteBuffer();
-    pushBytes(&buffer, bytes, 4);
-
-    id =  getHomeEasyId(buffer);
+    id =  getHomeEasyId(frame);
     printf("Should 00A0A406\nGet %08X\n", id);
 }
 
@@ -76,57 +72,48 @@ void testHomeEasyEncode()
 {
     BYTE_BUFFER source;
     BYTE_BUFFER encoded;
-    unsigned char bytes[] = {0x28, 0x28, 0x01};
+    unsigned long int frame = 0x2829019a;
     TEST_START;
 
-    source = createByteBuffer();
-    pushBytes(&source, bytes, 3);
-    printf("Input: ");
-    printfByteBuffer(source);
-    printf("Should: 59 95 59 95 55 56\nGet:    ");
+    printf("Input: %08X\n", frame);
+    printf("Should: 59 95 59 95 55 56 96 99\nGet:    ");
 
-    encoded = homeEasyEncode(&source);
+    encoded = homeEasyEncode(frame);
     printfByteBuffer(encoded);
 
-    destroyByteBuffer(source);
     destroyByteBuffer(encoded);
 }
 
 void testHomeEasyDecode()
 {
     BYTE_BUFFER source;
-    BYTE_BUFFER decoded;
-    unsigned char bytes[] = {0x59, 0x95, 0x59, 0x95, 0x55, 0x56};
+    unsigned long int decoded;
+    unsigned char bytes[] = {0x59, 0x95, 0x59, 0x96, 0x55, 0x56, 0x9A, 0x55};
     TEST_START;
 
     source = createByteBuffer();
-    pushBytes(&source, bytes, 6);
+    pushBytes(&source, bytes, 8);
     printf("Input: ");
     printfByteBuffer(source);
-    printf("Should: 28 28 01\nGet:    ");
-
-    decoded = homeEasyDecode(&source);
-    printfByteBuffer(decoded);
+    printf("Should: 282901B0\nGet:    %08X\n", homeEasyDecode(&source));
 
     destroyByteBuffer(source);
-    destroyByteBuffer(decoded);
 }
 
 
 void testHomeEasyCommand(char section, unsigned char num, unsigned char onOff)
 {
-    BYTE_BUFFER command;
+    unsigned long int command;
     BYTE_BUFFER encoded;
-    unsigned char id[] = {0x28, 0x28, 0x01, 0x80};
+    unsigned long int id = getHomeEasyId(0x2829019a);
     TEST_START;
 
     command = createHomeEasyCommand(id, section, num, onOff);
-    printfByteBuffer(command);
+    printf("%08X\n", command);
 
-    encoded = homeEasyEncode(&command);
+    encoded = homeEasyEncode(command);
     printfByteBuffer(encoded);
 
-    destroyByteBuffer(command);
     destroyByteBuffer(encoded);
 }
 
@@ -137,6 +124,8 @@ int main()
     testByteBuffer();
 
     testPrintBits();
+    
+    testGetId();
 
     testEncode();
 
@@ -147,8 +136,6 @@ int main()
     testHomeEasyDecode();
 
     testHomeEasyCommand('D', 4, OFF);
-
-    testGetId();
 
     return 0;
 }

@@ -2,7 +2,22 @@
 #include <unistd.h>
 #include <malloc.h>
 #include <string.h>
-#include <wiringPi.h>
+
+#ifdef __arm__
+    #include <wiringPiSPI.h>
+#else
+    #define LOW 0
+    #define HIGH 1
+    #define INPUT 0
+    #define OUTPUT 1
+    int wiringPiSetup(void) {return 0;}
+    void pinMode (int a, int b) {a=b;}
+    void delayMicroseconds(unsigned int a) {a=a;}
+    void digitalWrite(int a, int b) {a=b;}
+    int digitalRead(int a) {return a;}
+    
+#endif
+
 #include "home_easy.h"
 #include "buffer.h"
 #include "utils.h"
@@ -24,16 +39,16 @@ unsigned char homeEasyPinIn = 2;
 /**
  * Encode bits with HomeEasy encoding (1 => 10, 0 => 01)
  *
- * @param buffer the buffuer to encode
+ * @param frame 32-bit frame to encode
  *
  * @return new buffer
  * */
-BYTE_BUFFER homeEasyEncode(BYTE_BUFFER *buffer)
+BYTE_BUFFER homeEasyEncode(unsigned long int frame)
 {
     BYTE_BUFFER result = createByteBuffer();
     unsigned int i;
-    for(i=0; i<buffer->size; i++) {
-        pushWord(&result, encodeByte(buffer->data[i]));
+    for(i=0; i<4; i++) {
+        pushWord(&result, encodeByte((frame >> ((3 - i) * 8)) & 0xff));
     }
     return result;
 }
@@ -43,18 +58,18 @@ BYTE_BUFFER homeEasyEncode(BYTE_BUFFER *buffer)
  *
  * @param buffer the buffuer to decode
  *
- * @return new buffer
+ * @return new frame
  * */
-BYTE_BUFFER homeEasyDecode(BYTE_BUFFER *buffer)
+unsigned long int homeEasyDecode(BYTE_BUFFER *buffer)
 {
-    BYTE_BUFFER result = createByteBuffer();
+    unsigned long int result = 0;
     unsigned short int word;
     unsigned char *byte = (unsigned char*)&word;
     unsigned int i;
     for(i=0; i<(buffer->size+1)/2; i++) {
         byte[1] = buffer->data[2*i];
         byte[0] = (2*i+1 < buffer->size ? buffer->data[2*i+1]:0);
-        pushByte(&result, decodeByte(word));
+        result += (decodeByte(word)) << ((3 - i)* 8);
     }
     return result;
 }
@@ -104,24 +119,21 @@ unsigned short int encodeByte(unsigned char byte)
  * @param section button section ('A' | 'B'  | 'C'  | 'D'  | 'G')
  * @param nb button number(1, 2, 3, 4)
  * @param on boolean for on/off
+ * 
+ * @return HomeEasy frame
  */
-BYTE_BUFFER createHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on)
+unsigned long int createHomeEasyCommand(unsigned long int id, char section, unsigned char nb, unsigned char on)
 {
-    unsigned char last = id[3] & 0xc0;
-    BYTE_BUFFER command;
+    unsigned long int command = id << 6;
     char formatedSection = (section<='Z' ? section : section + 'A' - 'a');
     // adding global
-    last |= (formatedSection == 'G' ? 0x20 : 0);
+    command |= (formatedSection == 'G' ? 0x20 : 0);
     // adding on/off
-    last |= (on ? 0x10 : 0);
+    command |= (on ? 0x10 : 0);
     // adding section
-    last |= ((formatedSection == 'G' ? 0 : formatedSection - 'A') << 2) & 0x0c;
+    command |= ((formatedSection == 'G' ? 0 : formatedSection - 'A') << 2) & 0x0c;
     // adding num
-    last |= (formatedSection == 'G' ? 0 : nb-1) & 0x03;;
-    //Preparing output buffer
-    command = createByteBuffer();
-    pushBytes(&command, id, 3);
-    pushByte(&command, last);
+    command |= (formatedSection == 'G' ? 0 : nb-1) & 0x03;;
     return command;
 }
 
@@ -158,18 +170,17 @@ void sendFrame(BYTE_BUFFER frame, unsigned int repeat)
  * @param on boolean for on/off
  * @param repeat number of repeatition
  */
-void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on, unsigned char repeat)
+void sendHomeEasyCommand(unsigned long int id, char section, unsigned char nb, unsigned char on, unsigned char repeat)
 {
-    BYTE_BUFFER command;
+    unsigned long int command;
     BYTE_BUFFER encoded;
     // build the command
     command = createHomeEasyCommand(id, section, nb, on);
     // encode the command
-    encoded = homeEasyEncode(&command);
+    encoded = homeEasyEncode(command);
     // send data
     sendFrame(encoded, repeat);
     // release the memory
-    destroyByteBuffer(command);
     destroyByteBuffer(encoded);
 }
 
@@ -180,20 +191,9 @@ void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsi
  *
  * @return the device id
  */
-unsigned long int getHomeEasyId(BYTE_BUFFER buffer)
+unsigned long int getHomeEasyId(unsigned long int frame)
 {
-    unsigned long int id = 0;
-    unsigned long int byte;
-    int i;
-    // check that the frame is 32 bits
-    if (buffer.size != 4) {
-        return 0;
-    }
-    for (i=buffer.size; i>0; i--) {
-        byte = (unsigned long int) buffer.data[i-1];
-        id += byte <<  (8 * (buffer.size - i));
-    }
-    return id >> 6;
+    return frame >> 6;
 }
 
 /**

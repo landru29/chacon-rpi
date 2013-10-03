@@ -16,20 +16,20 @@
 /**
  * Encode bits with HomeEasy encoding (1 => 10, 0 => 01)
  *
- * @param buffer the buffuer to encode
+ * @param frame 32-bit frame to encode
  *
  * @return new buffer
  * */
-BYTE_BUFFER homeEasyEncode(BYTE_BUFFER *buffer);
+BYTE_BUFFER homeEasyEncode(unsigned long int frame);
 
 /**
  * Decode bits with HomeEasy encoding (1 => 10, 0 => 01)
  *
  * @param buffer the buffuer to decode
  *
- * @return new buffer
+ * @return new frame
  * */
-BYTE_BUFFER homeEasyDecode(BYTE_BUFFER *buffer);
+unsigned long int homeEasyDecode(BYTE_BUFFER *buffer);
 
 /**
  * Encode a byte according to HomeEasy
@@ -50,14 +50,16 @@ unsigned short int encodeByte(unsigned char byte);
 unsigned char decodeByte(unsigned short int word);
 
 /**
- * Creata a complete command according to Chacon protocole
+ * Create a complete command according to Chacon protocole
  *
  * @param id command id (refer to your remote)
  * @param section button section ('A' | 'B'  | 'C'  | 'D'  | 'G')
  * @param nb button number(1, 2, 3, 4)
  * @param on boolean for on/off
+ * 
+ * @return HomeEasy frame
  */
-BYTE_BUFFER createHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on);
+unsigned long int createHomeEasyCommand(unsigned long int id, char section, unsigned char nb, unsigned char on);
 
 /**
  * Send a complete command according to Chacon protocole
@@ -68,7 +70,7 @@ BYTE_BUFFER createHomeEasyCommand(unsigned char* id, char section, unsigned char
  * @param on boolean for on/off
  * @param repeat number of repeatition
  */
-void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsigned char on, unsigned char repeat);
+void sendHomeEasyCommand(unsigned long int id, char section, unsigned char nb, unsigned char on, unsigned char repeat);
 
 /**
  * Send n times a data frame
@@ -99,7 +101,7 @@ int initIO();
  *
  * @return the device id
  */
-unsigned long int getHomeEasyId(BYTE_BUFFER buffer);
+unsigned long int getHomeEasyId(unsigned long int frame);
 
 /**
  * read the GPIO output pin
