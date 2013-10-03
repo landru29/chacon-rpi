@@ -1,7 +1,4 @@
 #include <stdio.h>
-#ifdef __arm__
-    #include <wiringPiSPI.h>
-#endif
 #include "home_easy.h"
 #include "buffer.h"
 #include <malloc.h>
@@ -36,8 +33,7 @@ void usage(char** argv)
  */
 int main(int argc, char** argv)
 {
-    //BIT_BUFFER buffer;
-    BYTE_BUFFER command;
+    unsigned long int command;
     BYTE_BUFFER encoded;
     int i;
     char optstring[] = "xvb:d:r:";
@@ -99,17 +95,15 @@ int main(int argc, char** argv)
         printf("Frame to send: %08X\n", command);
 
         printf("Code to emit:\n");
-        encoded = homeEasyEncode(&command);
+        encoded = homeEasyEncode(command);
         printfByteBuffer(encoded);
+        // release the memory
+        destroyByteBuffer(encoded);
     }
 
     // Send the data
     initIO();
     sendHomeEasyCommand(id, section, number, onOff, repeat);
-
-    // release the memory
-    destroyByteBuffer(command);
-    destroyByteBuffer(encoded);
 
     return 0;
 }

@@ -4,7 +4,7 @@
 #include <string.h>
 
 #ifdef __arm__
-    #include <wiringPiSPI.h>
+    #include <wiringPi.h>
 #else
     #define LOW 0
     #define HIGH 1
@@ -15,7 +15,6 @@
     void delayMicroseconds(unsigned int a) {a=a;}
     void digitalWrite(int a, int b) {a=b;}
     int digitalRead(int a) {return a;}
-    
 #endif
 
 #include "home_easy.h"
