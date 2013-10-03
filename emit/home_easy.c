@@ -174,6 +174,29 @@ void sendHomeEasyCommand(unsigned char* id, char section, unsigned char nb, unsi
 }
 
 /**
+ * retrieve the HomeEasy device ID from a frame
+ *
+ * @param buffer the buffer that hold the frame
+ *
+ * @return the device id
+ */
+unsigned long int getHomeEasyId(BYTE_BUFFER buffer)
+{
+    unsigned long int id = 0;
+    unsigned long int byte;
+    int i;
+    // check that the frame is 32 bits
+    if (buffer.size != 4) {
+        return 0;
+    }
+    for (i=buffer.size; i>0; i--) {
+        byte = (unsigned long int) buffer.data[i-1];
+        id += byte <<  (8 * (buffer.size - i));
+    }
+    return id >> 6;
+}
+
+/**
  * Configure the GPIO output pin
  *
  * @param pinNumber wiringPi pin number

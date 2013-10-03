@@ -93,6 +93,15 @@ void setHomeEasyTransmittorPin(unsigned char pinNumber);
 int initIO();
 
 /**
+ * retrieve the HomeEasy device ID from a frame
+ *
+ * @param buffer the buffer that hold the frame
+ *
+ * @return the device id
+ */
+unsigned long int getHomeEasyId(BYTE_BUFFER buffer);
+
+/**
  * read the GPIO output pin
  *
  * @return wiringPi pin number

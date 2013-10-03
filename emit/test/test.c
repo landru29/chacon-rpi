@@ -37,6 +37,20 @@ void testPrintBits()
     destroyByteBuffer(buffer);
 }
 
+void testGetId()
+{
+    unsigned long int id;
+    BYTE_BUFFER buffer;
+    char bytes[] = {0x28, 0x29, 0x01, 0x9a};
+    TEST_START;
+
+    buffer = createByteBuffer();
+    pushBytes(&buffer, bytes, 4);
+
+    id =  getHomeEasyId(buffer);
+    printf("Should 00A0A406\nGet %08X\n", id);
+}
+
 void testEncode()
 {
     unsigned char srcByte = 0x28;
@@ -133,6 +147,8 @@ int main()
     testHomeEasyDecode();
 
     testHomeEasyCommand('D', 4, OFF);
+
+    testGetId();
 
     return 0;
 }
