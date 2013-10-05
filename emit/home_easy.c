@@ -333,11 +333,14 @@ BYTE_BUFFER readData(unsigned long int samples, unsigned int duration)
     result.size = samples;
     result.data = (char*) realloc(result.data, samples);
 
+    scheduler_realtime();
     start = showTime(0);
     for(i=0; i<samples; i++) {
         result.data[i] = digitalRead(homeEasyPinIn);
         delayMicroseconds(duration);
     }
     showTime(start);
+    scheduler_standard();
+
     return result;
 }
