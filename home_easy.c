@@ -28,7 +28,7 @@ unsigned int timings[5][2] = {
     {275, 1300}, //  bit 1
     {275, 9900},  //  start of data
     {275, 2675}, //  start of frame
-    {275, 10000},  //  end of data
+    {275, 2675},  //  end of data
 };
 
 unsigned char homeEasyPinOut = 0;
@@ -146,7 +146,7 @@ void sendFrame(BYTE_BUFFER frame, unsigned int repeat)
 {
     unsigned int i;
     // switch to real time
-    scheduler_realtime();
+    cpuMode(REAL_TIME);
     // send header
     sendHomeEasyBit(START_OF_DATA);
     sendHomeEasyBit(START_OF_FRAME);
@@ -157,7 +157,7 @@ void sendFrame(BYTE_BUFFER frame, unsigned int repeat)
     }
     digitalWrite(homeEasyPinOut, LOW);
     // Exit real time mode
-    scheduler_standard();
+    cpuMode(STANDARD);
 }
 
 /**
@@ -333,14 +333,14 @@ BYTE_BUFFER readData(unsigned long int samples, unsigned int duration)
     result.size = samples;
     result.data = (char*) realloc(result.data, samples);
 
-    scheduler_realtime();
+    cpuMode(REAL_TIME);
     start = showTime(0);
     for(i=0; i<samples; i++) {
         result.data[i] = digitalRead(homeEasyPinIn);
         delayMicroseconds(duration);
     }
     showTime(start);
-    scheduler_standard();
+    cpuMode(STANDARD);
 
     return result;
 }

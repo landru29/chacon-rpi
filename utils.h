@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+#define REAL_TIME 0
+#define STANDARD  1
+
 /**
  * Calculate a duration
  *
@@ -17,8 +20,10 @@ struct timeval* showTime(struct timeval* start);
 
 /**
  * Switch to real-time mode
+ *
+ * @param mode (REAL_TIME | STANDARD)
  */
-void scheduler_realtime();
+void cpuMode(int mode);
 
 /**
  * Exit from real-time mode

@@ -30,25 +30,26 @@ struct timeval* showTime(struct timeval* start)
 }
 
 /**
- * Switch to real-time mode
+ * Switch between standard and  real-time mode
+ *
+ * @param mode (REAL_TIME | STANDARD)
  */
-void scheduler_realtime()
+void cpuMode(int mode)
 {
     struct sched_param p;
-    p.__sched_priority = sched_get_priority_max(SCHED_RR);
-    if( sched_setscheduler( 0, SCHED_RR, &p ) == -1 ) {
-        perror("Failed to switch to realtime scheduler.");
-    }
-}
-
-/**
- * Exit from real-time mode
- */
-void scheduler_standard()
-{
-    struct sched_param p;
-    p.__sched_priority = 0;
-    if( sched_setscheduler( 0, SCHED_OTHER, &p ) == -1 ) {
-        perror("Failed to switch to normal scheduler.");
+    switch (mode) {
+        case REAL_TIME:
+            p.__sched_priority = sched_get_priority_max(SCHED_RR);
+            if( sched_setscheduler( 0, SCHED_RR, &p ) == -1 ) {
+                perror("Failed to switch to realtime scheduler.");
+            }
+            break;
+        case STANDARD:
+        default:
+            p.__sched_priority = 0;
+            if( sched_setscheduler( 0, SCHED_OTHER, &p ) == -1 ) {
+                perror("Failed to switch to normal scheduler.");
+            }
+            break;
     }
 }

@@ -16,7 +16,7 @@ emit.o : emit.c
 	gcc -c $< -o $@
 
 clean:
-	rm -f emit *.o
+	rm -f emit listen *.o
 
 install: emit
 	cp -f emit /usr/local/bin/.
