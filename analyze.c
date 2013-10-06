@@ -26,6 +26,9 @@ void analyse(BYTE_BUFFER buffer, FILE* output, unsigned char all)
     unsigned char bitNumber = 0;
     unsigned char startData = 0;
     unsigned char* data = buffer.data;
+    unsigned char extractedSection;
+    unsigned char extractedNumber;
+    unsigned char extractedOnOff;
     BYTE_BUFFER readFrame;
     unsigned long int readDWord;
     readFrame = createByteBuffer();
@@ -39,7 +42,9 @@ void analyse(BYTE_BUFFER buffer, FILE* output, unsigned char all)
                 currentByte = 0;
                 if (readFrame.size == 8) {
                     readDWord = homeEasyDecode(&readFrame);
-                    fprintf(output, "Decoded command: %08X\nID found: %08X\n", readDWord, getHomeEasyId(readDWord));
+                    getHomeEasyInfo(readDWord, 0, &extractedOnOff, &extractedSection, &extractedNumber);
+                    fprintf(output, "\nDecoded command: %08X\nID found: %08X\n", readDWord, getHomeEasyId(readDWord));
+                    fprintf(output, "Button %c%d - %s pressed", extractedSection, extractedNumber, (extractedOnOff ? "OFF" : "ON"));
                 } else {
                     fprintf(output, "Nothing to decode with %d byte(s)\n", readFrame.size);
                 }

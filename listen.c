@@ -35,7 +35,7 @@ int main (int argc, char** argv)
     struct timeval* start;
     int option;
     unsigned int duration = 80;
-    unsigned long int samples = 10000;
+    unsigned long int samples = 50000;
     unsigned char verbose = 0;
     unsigned char all = 0;
     FILE* output=0;

@@ -1,6 +1,4 @@
 **.o
-listen/listen
-listen/*.txt
-emit/*.o
-emit/emit
-emit/test/test
+emit
+listen
+test/test

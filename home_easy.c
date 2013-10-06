@@ -22,8 +22,6 @@
 #include "utils.h"
 
 unsigned int timings[5][2] = {
-    //{310, 310},  // bit 0
-    //{310, 1340}, // bit 1
     {275, 275},  //  bit 0
     {275, 1300}, //  bit 1
     {275, 9900},  //  start of data
@@ -193,6 +191,40 @@ void sendHomeEasyCommand(unsigned long int id, char section, unsigned char nb, u
 unsigned long int getHomeEasyId(unsigned long int frame)
 {
     return frame >> 6;
+}
+
+/**
+ * Get all information about the homeEasy frame
+ *
+ * @param frame the frame to read
+ * @param id the identifier to extract
+ * @param onOff boolean to extract; if true : off
+ * @param section letter section to extract
+ * @param number number to extract
+ */
+void getHomeEasyInfo(unsigned long int frame, unsigned long int* id, unsigned char* onOff, unsigned char* section, unsigned char* number)
+{
+    unsigned char data = (unsigned char)(frame & 0x0000007f);
+    if (id) {
+        *id = getHomeEasyId(frame);
+    }
+    if (onOff) {
+        *onOff = ((data & 0x10) == 0);
+    }
+    if (section) {
+        if ((data & 0x20) == 0x20) {
+            *section = 'G';
+        } else {
+            *section = ((data & 0x0f) >> 2) + 'A';
+        }
+    }
+    if (number) {
+        if ((data & 0x20) != 0x20) {
+            *number = 1 + (data & 0x03);
+        } else {
+            *number=0;
+        }
+    }
 }
 
 /**

@@ -104,6 +104,17 @@ int initIO();
 unsigned long int getHomeEasyId(unsigned long int frame);
 
 /**
+ * Get all information about the homeEasy frame
+ *
+ * @param frame the frame to read
+ * @param id the identifier to extract
+ * @param onOff boolean to extract; if true : on
+ * @param section letter section to extract
+ * @param number number to extract
+ */
+void getHomeEasyInfo(unsigned long int frame, unsigned long int* id, unsigned char* onOff, unsigned char* section, unsigned char* number);
+
+/**
  * read the GPIO output pin
  *
  * @return wiringPi pin number
