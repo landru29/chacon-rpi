@@ -1,0 +1,40 @@
+# Pin name action command file
+
+# Start of element RECEPTOR
+ChangePinName(RECEPTOR, 1, 1)
+ChangePinName(RECEPTOR, 4, 4)
+ChangePinName(RECEPTOR, 2, 2)
+ChangePinName(RECEPTOR, 3, 3)
+
+# Start of element TRANSMITOR
+ChangePinName(TRANSMITOR, 3, 3)
+ChangePinName(TRANSMITOR, 1, 1)
+ChangePinName(TRANSMITOR, 2, 2)
+
+# Start of element GPIORPI
+ChangePinName(GPIORPI, 26, 26)
+ChangePinName(GPIORPI, 25, 25)
+ChangePinName(GPIORPI, 24, 24)
+ChangePinName(GPIORPI, 23, 23)
+ChangePinName(GPIORPI, 22, 22)
+ChangePinName(GPIORPI, 21, 21)
+ChangePinName(GPIORPI, 20, 20)
+ChangePinName(GPIORPI, 19, 19)
+ChangePinName(GPIORPI, 18, 18)
+ChangePinName(GPIORPI, 17, 17)
+ChangePinName(GPIORPI, 16, 16)
+ChangePinName(GPIORPI, 15, 15)
+ChangePinName(GPIORPI, 14, 14)
+ChangePinName(GPIORPI, 13, 13)
+ChangePinName(GPIORPI, 12, 12)
+ChangePinName(GPIORPI, 11, 11)
+ChangePinName(GPIORPI, 10, 10)
+ChangePinName(GPIORPI, 9, 9)
+ChangePinName(GPIORPI, 8, 8)
+ChangePinName(GPIORPI, 7, 7)
+ChangePinName(GPIORPI, 6, 6)
+ChangePinName(GPIORPI, 5, 5)
+ChangePinName(GPIORPI, 4, 4)
+ChangePinName(GPIORPI, 3, 3)
+ChangePinName(GPIORPI, 2, 2)
+ChangePinName(GPIORPI, 1, 1)

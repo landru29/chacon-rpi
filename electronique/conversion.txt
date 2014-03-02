@@ -1,0 +1,1 @@
+convert -density 150 -flip typon.pdf -quality 100 -sharpen 0x1.0 typon.png
